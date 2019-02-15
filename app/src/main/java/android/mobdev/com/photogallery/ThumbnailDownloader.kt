@@ -9,7 +9,6 @@ import android.os.Message
 import android.graphics.BitmapFactory
 import java.io.IOException
 import android.graphics.Bitmap
-import android.text.method.TextKeyListener.clear
 
 
 
@@ -80,8 +79,7 @@ class ThumbnailDownloader<T> : HandlerThread {
                 .decodeByteArray(bitmapBytes, 0, bitmapBytes.size)
             Log.i(TAG, "Bitmap created")
             mResponseHandler?.post(Runnable {
-                if (mRequestMap[target] !== url || mHasQuit) {
-                    return@Runnable }
+                if (mRequestMap[target] !== url || mHasQuit) { return@Runnable }
                 mRequestMap.remove(target)
                 mThumbnailDownloadListener?.onThumbnailDownloaded(target, bitmap) })
         } catch (ioe: IOException) {

@@ -14,6 +14,17 @@ class FlickrFetchr {
 
     private val TAG = "FlickrFetchr"
     private val API_KEY = "1bab082052d7cf8b3aa9e2bc92882ac0"
+    private val FETCH_RECENTS_METHOD = "flickr.photos.getRecent"
+    private val SEARCH_METHOD = "flickr.photos.search"
+
+    private val ENDPOINT = Uri
+        .parse("https://api.flickr.com/services/rest/")
+        .buildUpon()
+        .appendQueryParameter("api_key", API_KEY)
+        .appendQueryParameter("format", "json")
+        .appendQueryParameter("nojsoncallback", "1")
+        .appendQueryParameter("extras", "url_s")
+        .build()
 
     fun getUrlBytes(urlSpec: String): ByteArray {
         val url = URL(urlSpec)
@@ -42,18 +53,20 @@ class FlickrFetchr {
         return String(getUrlBytes(urlSpec))
     }
 
+    fun fetchRecentPhotos(): List<GalleryItem> {
+        var url = buildUrl(FETCH_RECENTS_METHOD, null)
+        return downloadGalleryItems(url)
+    }
 
-    fun fetchItems(): ArrayList<GalleryItem> {
+    fun searchPhotos(query: String): List<GalleryItem> {
+        var url = buildUrl(SEARCH_METHOD, query)
+        return downloadGalleryItems(url)
+    }
+
+
+    private fun downloadGalleryItems(url: String): ArrayList<GalleryItem> {
         val items = ArrayList<GalleryItem>()
         try {
-            val url = Uri.parse("https://api.flickr.com/services/rest/")
-                .buildUpon()
-                .appendQueryParameter("method", "flickr.photos.getRecent")
-                .appendQueryParameter("api_key", API_KEY)
-                .appendQueryParameter("format", "json")
-                .appendQueryParameter("nojsoncallback", "1")
-                .appendQueryParameter("extras", "url_s")
-                .build().toString()
             val jsonString = getUrlString(url)
             Log.i(TAG, "Received JSON: $jsonString")
             val jsonBody = JSONObject(jsonString)
@@ -64,6 +77,15 @@ class FlickrFetchr {
             Log.e(TAG, "Failed to parse JSON", je)
         }
         return items
+    }
+
+    private fun buildUrl(method: String, query: String?): String {
+        val uriBuilder = ENDPOINT.buildUpon().appendQueryParameter("method", method)
+
+        if (method == SEARCH_METHOD) {
+            uriBuilder.appendQueryParameter("text", query)
+        }
+        return uriBuilder.build().toString()
     }
 
     @Throws(Exception::class)

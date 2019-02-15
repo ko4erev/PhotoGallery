@@ -17,8 +17,6 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.Bitmap
 
 
-
-
 class PhotoGalleryFragment : Fragment() {
     private var mPhotoRecyclerView: RecyclerView? = null
     private var mItems = ArrayList<GalleryItem>()
@@ -103,8 +101,13 @@ class PhotoGalleryFragment : Fragment() {
 
     private inner class FetchItemsTask : AsyncTask<Void, Void, List<GalleryItem>>() {
 
-        override fun doInBackground(vararg params: Void?): ArrayList<GalleryItem> {
-            return FlickrFetchr().fetchItems()
+        override fun doInBackground(vararg params: Void?): List<GalleryItem> {
+            val query = "robot" // Для тестирования
+            return if (query == null) {
+                FlickrFetchr().fetchRecentPhotos()
+            } else {
+                FlickrFetchr().searchPhotos(query)
+            }
         }
 
         override fun onPostExecute(items: List<GalleryItem>) {
