@@ -58,7 +58,7 @@ class FlickrFetchr {
         return downloadGalleryItems(url)
     }
 
-    fun searchPhotos(query: String): List<GalleryItem> {
+    fun searchPhotos(query: String?): List<GalleryItem> {
         var url = buildUrl(SEARCH_METHOD, query)
         return downloadGalleryItems(url)
     }
