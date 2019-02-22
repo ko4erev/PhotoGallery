@@ -2,6 +2,7 @@ package android.mobdev.com.photogallery
 
 import android.content.ContentValues.TAG
 import android.content.Context
+import android.content.Intent
 import android.os.AsyncTask
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -94,12 +95,26 @@ class PhotoGalleryFragment : Fragment() {
             val query = QueryPreferences.getStoredQuery(activity as Context)
             searchView.setQuery(query, false)
         }
+
+        val toggleItem = menu.findItem(R.id.menu_item_toggle_polling)
+        if (PollService.isServiceAlarmOn(activity as Context)) {
+            toggleItem.setTitle(R.string.stop_polling)
+        } else {
+            toggleItem.setTitle(R.string.start_polling)
+
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.menu_item_clear -> {
             QueryPreferences.setStoredQuery(activity as Context, null)
             updateItems()
+            true
+        }
+        R.id.menu_item_toggle_polling -> {
+            val shouldStartAlarm = !PollService.isServiceAlarmOn(activity as Context)
+            PollService.setServiceAlarm(activity as Context, shouldStartAlarm)
+            activity?.invalidateOptionsMenu()
             true
         }
         else -> super.onOptionsItemSelected(item)
