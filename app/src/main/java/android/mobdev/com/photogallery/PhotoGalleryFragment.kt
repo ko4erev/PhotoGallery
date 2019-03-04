@@ -16,6 +16,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.Bitmap
 import android.view.*
 import android.support.v7.widget.SearchView
+import android.support.v4.content.ContextCompat.startActivity
 
 
 class PhotoGalleryFragment : Fragment() {
@@ -131,13 +132,29 @@ class PhotoGalleryFragment : Fragment() {
         }
     }
 
-    inner class PhotoHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class PhotoHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
         private val mItemImageView: ImageView = itemView.findViewById(R.id.item_image_view) as ImageView
+        private var mGalleryItem: GalleryItem? = null
+
+        init {
+            itemView.setOnClickListener(this)
+
+        }
 
         fun bindDrawable(drawable: Drawable) {
             mItemImageView.setImageDrawable(drawable)
         }
+
+        fun bindGalleryItem(galleryItem: GalleryItem) {
+            mGalleryItem = galleryItem
+        }
+
+        override fun onClick(v: View) {
+            val i = Intent(Intent.ACTION_VIEW, mGalleryItem?.getPhotoPageUri())
+            startActivity(i)
+        }
     }
+
 
     private inner class PhotoAdapter(private val mGalleryItems: List<GalleryItem>) :
         RecyclerView.Adapter<PhotoHolder>() {
@@ -149,6 +166,7 @@ class PhotoGalleryFragment : Fragment() {
 
         override fun onBindViewHolder(photoHolder: PhotoHolder, position: Int) {
             val galleryItem = mGalleryItems[position]
+            photoHolder.bindGalleryItem(galleryItem)
             galleryItem.mUrl?.let { mThumbnailDownloader?.queueThumbnail(photoHolder, it) }
         }
 

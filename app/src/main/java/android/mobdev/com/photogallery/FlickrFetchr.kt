@@ -102,6 +102,7 @@ class FlickrFetchr {
                 continue
             }
             item.mUrl = (photoJsonObject.getString("url_s"))
+            item.mOwner = (photoJsonObject.getString("owner"))
             items.add(item)
         }
     }
