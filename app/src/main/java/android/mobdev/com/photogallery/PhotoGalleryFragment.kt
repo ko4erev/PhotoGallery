@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.AsyncTask
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.widget.ImageView
@@ -16,10 +15,12 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.Bitmap
 import android.view.*
 import android.support.v7.widget.SearchView
-import android.support.v4.content.ContextCompat.startActivity
+import android.content.ClipData.newIntent
 
 
-class PhotoGalleryFragment : Fragment() {
+
+
+class PhotoGalleryFragment : VisibleFragment() {
     private var mPhotoRecyclerView: RecyclerView? = null
     private var mItems = ArrayList<GalleryItem>()
     private var mThumbnailDownloader: ThumbnailDownloader<PhotoHolder>? = null
@@ -150,7 +151,9 @@ class PhotoGalleryFragment : Fragment() {
         }
 
         override fun onClick(v: View) {
-            val i = Intent(Intent.ACTION_VIEW, mGalleryItem?.getPhotoPageUri())
+            val i = mGalleryItem?.getPhotoPageUri()?.let {
+                PhotoPageActivity.newIntent(activity as Context, it)
+            }
             startActivity(i)
         }
     }

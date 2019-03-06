@@ -12,6 +12,7 @@ import android.os.SystemClock
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.NotificationManagerCompat
 import android.support.v4.app.RemoteInput
+import android.app.Activity
 
 
 class PollService : IntentService(TAG) {
@@ -58,10 +59,20 @@ class PollService : IntentService(TAG) {
                 .setContentIntent(pi)
                 .setAutoCancel(true)
                 .build()
-            val notificationManager = NotificationManagerCompat.from(this)
-            notificationManager.notify(0, notification)
+            sendBroadcast(Intent(ACTION_SHOW_NOTIFICATION), PERM_PRIVATE)
+            showBackgroundNotification(0, notification)
         }
         QueryPreferences.setLastResultId(this, resultId)
+    }
+
+    private fun showBackgroundNotification(requestCode: Int, notification: Notification) {
+        val i = Intent(ACTION_SHOW_NOTIFICATION)
+        i.putExtra(REQUEST_CODE, requestCode)
+        i.putExtra(NOTIFICATION, notification)
+        sendOrderedBroadcast(
+            i, PERM_PRIVATE, null, null,
+            Activity.RESULT_OK, null, null
+        )
     }
 
     private fun createNotificationChannel() {
@@ -88,6 +99,10 @@ class PollService : IntentService(TAG) {
 
     companion object {
         val TAG = "PollService"
+        val ACTION_SHOW_NOTIFICATION = "com.bignerdranch.android.photogallery.SHOW_NOTIFICATION"
+        val PERM_PRIVATE = "com.bignerdranch.android.photogallery.PRIVATE"
+        val REQUEST_CODE = "REQUEST_CODE"
+        val NOTIFICATION = "NOTIFICATION"
         // 60 секунд
         private val POLL_INTERVAL_MS = TimeUnit.MINUTES.toMillis(1)
 
